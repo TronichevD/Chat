@@ -1,23 +1,16 @@
-import { Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
-import Chat from "./pages/Chat";
-import ProtectedRoute from "./components/ProtectedRoute";
+import ChatList from "./pages/ChatList";
 
 function App() {
     return (
-        <div className="p-4">
-            <nav className="mb-4">
-                <Link to="/" className="mr-4 text-blue-500">Login</Link>
-                <Link to="/chat" className="text-blue-500">Chat</Link>
-            </nav>
-
+        <Router>  {/* Единственный Router в приложении */}
             <Routes>
-                <Route path="/" element={<Login />} />
-                <Route element={<ProtectedRoute />}>
-                    <Route path="/chat" element={<Chat />} />
-                </Route>
+                <Route path="/login" element={<Login />} />
+                <Route path="/chats" element={<ChatList />} />
+                <Route path="*" element={<Login />} /> {/* 404 - редирект на Login */}
             </Routes>
-        </div>
+        </Router>
     );
 }
 
