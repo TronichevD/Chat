@@ -19,7 +19,7 @@ public class MessageController {
         return ResponseEntity.ok(messageService.sendMessage(userId, channelId, content));
     }
 
-    @GetMapping("/channel/{channelId}")
+    @GetMapping("/channels/{channelId}")
     public ResponseEntity<List<Message>> getMessagesByChannel(@PathVariable Long channelId) {
         return ResponseEntity.ok(messageService.getMessagesByChannel(channelId));
     }
