@@ -1,5 +1,6 @@
 package chat.chatapp.controller;
 
+import chat.chatapp.dto.MessageRequest;
 import chat.chatapp.model.Message;
 import chat.chatapp.service.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -23,4 +24,15 @@ public class MessageController {
     public ResponseEntity<List<Message>> getMessagesByChannel(@PathVariable Long channelId) {
         return ResponseEntity.ok(messageService.getMessagesByChannel(channelId));
     }
+
+    @PostMapping("/{channelId}/messages")
+    public ResponseEntity<Message> sendMessage(
+            @PathVariable Long channelId,
+            @RequestParam Long userId,
+            @RequestBody MessageRequest request) {
+
+        Message message = messageService.sendMessage(userId, channelId, request.getContent());
+        return ResponseEntity.ok(message);
+    }
+
 }

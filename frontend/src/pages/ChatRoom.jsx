@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 const ChatRoom = () => {
-    const { id } = useParams(); // Получаем ID чата из URL
+    const { id } = useParams(); // Получаем ID канала (чата) из URL
     const navigate = useNavigate();
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
@@ -48,9 +48,7 @@ const ChatRoom = () => {
         try {
             // Получаем userId по username
             const userRes = await fetch(`http://localhost:8080/api/users/by-username/${username}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
+                headers: { Authorization: `Bearer ${token}` },
             });
 
             if (!userRes.ok) {
@@ -60,7 +58,7 @@ const ChatRoom = () => {
             const userData = await userRes.json();
             const userId = userData.id;
 
-            // Теперь отправляем сообщение с userId
+            // Отправляем сообщение с userId и channelId (id из useParams)
             const messageRes = await fetch(`http://localhost:8080/api/messages/send`, {
                 method: "POST",
                 headers: {
@@ -69,8 +67,8 @@ const ChatRoom = () => {
                 },
                 body: JSON.stringify({
                     userId: userId,
-                    channelId: channelId,
-                    content: message,
+                    channelId: id, // Используем id из useParams()
+                    content: newMessage, // Отправляемый текст
                 }),
             });
 
@@ -79,11 +77,14 @@ const ChatRoom = () => {
             }
 
             console.log("Сообщение отправлено!");
+
+            // Обновляем список сообщений после отправки
+            setMessages([...messages, { id: Date.now(), sender: { username }, content: newMessage }]);
+            setNewMessage(""); // Очищаем поле ввода
         } catch (error) {
             console.error("Ошибка при отправке сообщения:", error);
         }
     };
-
 
     return (
         <div className="p-6">
