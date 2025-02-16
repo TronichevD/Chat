@@ -17,7 +17,7 @@ const ChatRoom = () => {
             }
 
             try {
-                const response = await fetch(`http://localhost:8080/api/channels/${id}/messages`, {
+                const response = await fetch(`http://localhost:8080/api/messages/channels/${id}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 
@@ -38,33 +38,52 @@ const ChatRoom = () => {
 
     const sendMessage = async () => {
         const token = localStorage.getItem("token");
-        if (!token) {
-            navigate("/login");
+        const username = localStorage.getItem("username");
+
+        if (!username) {
+            console.error("Ошибка: username не найден");
             return;
         }
 
         try {
-            const response = await fetch(`http://localhost:8080/api/channels/${id}/messages`, {
+            // Получаем userId по username
+            const userRes = await fetch(`http://localhost:8080/api/users/by-username/${username}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!userRes.ok) {
+                throw new Error("Ошибка при получении userId");
+            }
+
+            const userData = await userRes.json();
+            const userId = userData.id;
+
+            // Теперь отправляем сообщение с userId
+            const messageRes = await fetch(`http://localhost:8080/api/messages/send`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({ content: newMessage }),
+                body: JSON.stringify({
+                    userId: userId,
+                    channelId: channelId,
+                    content: message,
+                }),
             });
 
-            if (!response.ok) {
+            if (!messageRes.ok) {
                 throw new Error("Ошибка при отправке сообщения");
             }
 
-            const newMsg = await response.json();
-            setMessages([...messages, newMsg]); // Добавляем новое сообщение в список
-            setNewMessage(""); // Очищаем поле ввода
-        } catch (err) {
-            console.error("Ошибка при отправке сообщения:", err);
-            setError(err.message);
+            console.log("Сообщение отправлено!");
+        } catch (error) {
+            console.error("Ошибка при отправке сообщения:", error);
         }
     };
+
 
     return (
         <div className="p-6">

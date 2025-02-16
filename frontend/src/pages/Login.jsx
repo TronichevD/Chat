@@ -17,11 +17,14 @@ const Login = () => {
         if (response.ok) {
             const data = await response.json();
             localStorage.setItem("token", data.token);
-            navigate("/channels"); // ✅ Переход на список чатов
+            localStorage.setItem("userId", data.userId); // ✅ Сохраняем userId
+            localStorage.setItem("username", username); // ✅ Также сохраняем username
+            navigate("/channels");
         } else {
             console.error("Login failed");
         }
     };
+
 
     return (
         <div className="flex justify-center items-center h-screen">

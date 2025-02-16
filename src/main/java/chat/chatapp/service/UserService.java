@@ -38,4 +38,11 @@ public class UserService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
     }
+
+    //Поиск пользователя по username
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
+    }
+
 }

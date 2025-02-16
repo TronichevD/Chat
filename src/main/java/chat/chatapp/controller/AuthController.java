@@ -53,6 +53,7 @@ public class AuthController {
         // Генерируем JWT
         Map<String, String> response = new HashMap<>();
         response.put("token", jwtUtil.generateToken(username));
+        response.put("userId", String.valueOf(user.getId()));
 
         return ResponseEntity.ok(response);
     }
