@@ -3,45 +3,49 @@ import { useNavigate } from "react-router-dom";
 
 const ChatList = () => {
     const [chats, setChats] = useState([]);
+    const [error, setError] = useState("");
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchChats = async () => {
-            const token = localStorage.getItem("token");
-            const response = await fetch("http://localhost:8080/api/channels", {
-                headers: { Authorization: `Bearer ${token}` },
-            });
+            try {
+                const token = localStorage.getItem("token"); // ✅ Берем токен
+                const response = await fetch("http://localhost:8080/api/chats", {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
 
-            if (!response.ok) {
-                console.error("Ошибка при загрузке чатов");
-                return;
+                if (!response.ok) {
+                    throw new Error("Failed to fetch chats");
+                }
+
+                const data = await response.json();
+                setChats(data);
+            } catch (error) {
+                setError(error.message);
             }
-
-            const data = await response.json();
-            setChats(data);
         };
 
         fetchChats();
     }, []);
 
     return (
-        <div className="p-6">
-            <h2 className="text-2xl font-bold mb-4">Список чатов</h2>
-            {chats.length === 0 ? (
-                <p>Нет доступных чатов</p>
-            ) : (
-                <ul>
-                    {chats.map((chat) => (
-                        <li
-                            key={chat.id}
-                            className="border p-2 mb-2 cursor-pointer hover:bg-gray-100"
-                            onClick={() => navigate(`/chat/${chat.id}`)}
-                        >
-                            {chat.name}
-                        </li>
-                    ))}
-                </ul>
-            )}
+        <div className="flex flex-col items-center p-6 bg-gray-100 h-screen">
+            <h2 className="text-2xl font-semibold mb-4">Chats</h2>
+            {error && <p className="text-red-500">{error}</p>}
+            <ul className="w-full max-w-lg bg-white shadow-md rounded-md">
+                {chats.map((chat) => (
+                    <li
+                        key={chat.id}
+                        onClick={() => navigate(`/chat/${chat.id}`)} // ✅ Переход в ChatRoom
+                        className="p-4 border-b hover:bg-gray-200 cursor-pointer"
+                    >
+                        {chat.name}
+                    </li>
+                ))}
+            </ul>
         </div>
     );
 };
